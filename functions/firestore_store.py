@@ -225,8 +225,8 @@ class FirestoreCardKissTracker:
                 'kiss_count': data.get('kiss_count', 0)
             })
 
-        # Sort by elixir cost, then name
-        cards.sort(key=lambda x: (x.get('elixir_cost', 0), x.get('name', '')))
+        # Sort by elixir cost, then name (handle None values)
+        cards.sort(key=lambda x: (x.get('elixir_cost') or 0, x.get('name') or ''))
         return cards
 
     def get_leaderboard(self, limit: int = 50) -> List[tuple]:
