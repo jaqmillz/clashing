@@ -447,9 +447,11 @@
                 return;
             }
 
-            grid.innerHTML = cards.map(card => `
+            grid.innerHTML = cards
+                .filter(card => card.icon_url && card.rarity && card.elixir_cost !== null) // Filter out incomplete cards
+                .map(card => `
                 <div class="card-item">
-                    ${card.icon_url ? `<img src="${card.icon_url}" alt="${card.name}" class="card-image">` : ''}
+                    <img src="${card.icon_url}" alt="${card.name}" class="card-image">
                     <div class="card-name">${card.name}</div>
                     <div class="card-rarity rarity-${card.rarity.toLowerCase()}">${card.rarity}</div>
                     <div class="card-elixir">⚡ ${card.elixir_cost}</div>
@@ -460,7 +462,7 @@
                         👋 Slap
                     </button>
                     <div class="kiss-count" id="kiss-${card.name.replace(/[^a-zA-Z0-9]/g, '_')}">
-                        ${card.kisses || 0} kisses
+                        ${card.kiss_count || 0} kisses
                     </div>
                 </div>
             `).join('');

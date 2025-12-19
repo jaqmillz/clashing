@@ -14,9 +14,8 @@ build/
 .venv/
 venv/
 
-# Data
-data/*.parquet
-data/*.csv
+# Data (now stored in Firestore)
+data/
 
 # IDEs
 .vscode/

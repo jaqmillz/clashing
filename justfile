@@ -41,3 +41,12 @@ firebase-deploy-firestore:
 
 firebase-serve:
     firebase serve
+
+# Serve static files locally (for testing with production Firebase backend)
+serve-local:
+    @echo "Starting local server on http://localhost:8000"
+    @cd public && python3 -m http.server 8000
+
+# Stop local server
+stop-local:
+    @lsof -ti:8000 | xargs kill -9 2>/dev/null || echo "No server running on port 8000"
