@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clash Royale Stats Tracker</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/awesomplete@1.1.7/awesomplete.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease-in;
+            position: relative;
+            padding-top: 50px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .nav-link {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #fbbf24;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: #f59e0b;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding-top: 60px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
+            .nav-link {
+                top: 5px;
+                right: 5px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding-top: 10px;
+            }
+
+            .nav-link {
+                position: static;
+                display: block;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1000000;
+        }
+
+        .search-box h2 {
+            color: #fbbf24;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-form {
+            position: relative;
+        }
+
+        .search-form input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            font-size: 1.05rem;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .search-form input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-form input:focus {
+            outline: none;
+            border-color: #fbbf24;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Awesomplete custom styling */
+        .awesomplete {
+            width: 100%;
+        }
+
+        .awesomplete > ul {
+            background: rgba(15, 29, 56, 0.98) !important;
+            backdrop-filter: blur(10px);
+            border: 2px solid #fbbf24 !important;
+            border-top: none !important;
+            border-radius: 0 0 12px 12px !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(251, 191, 36, 0.3) !important;
+            z-index: 10000000 !important;
+            margin-top: -2px !important;
+        }
+
+        .awesomplete > ul > li {
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .awesomplete > ul > li:last-child {
+            border-bottom: none;
+        }
+
+        .awesomplete > ul > li[aria-selected="true"] {
+            background: #1a2942;
+        }
+
+        .awesomplete mark {
+            background: transparent;
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Performance Popup Overlay */
+        .performance-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .performance-overlay.show {
+            display: flex;
+        }
+
+        .performance-popup {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.95) 0%, rgba(220, 38, 38, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .close-popup {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+
+        .close-popup:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .performance-popup h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .skill-badge {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .roast-item {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-left: 4px solid rgba(255, 255, 255, 0.5);
+            animation: slideInRoast 0.5s ease-in both;
+        }
+
+        .roast-item:nth-child(1) { animation-delay: 0.1s; }
+        .roast-item:nth-child(2) { animation-delay: 0.2s; }
+        .roast-item:nth-child(3) { animation-delay: 0.3s; }
+        .roast-item:nth-child(4) { animation-delay: 0.4s; }
+        .roast-item:nth-child(5) { animation-delay: 0.5s; }
+        .roast-item:nth-child(6) { animation-delay: 0.6s; }
+        .roast-item:nth-child(7) { animation-delay: 0.7s; }
+        .roast-item:nth-child(8) { animation-delay: 0.8s; }
+
+        .roast-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Raining thumbs down */
+        .thumbs-down {
+            position: fixed;
+            font-size: 3rem;
+            z-index: 10000;
+            pointer-events: none;
+            animation: fall linear forwards;
+            opacity: 0.9;
+        }
+
+        .view-analysis-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
+            transition: all 0.3s ease;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .view-analysis-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(239, 68, 68, 0.7);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card h3 {
+            color: #fbbf24;
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+
+        .stat-value {
+            font-weight: 800;
+            color: #fff;
+            font-size: 1.05rem;
+        }
+
+        .trend-positive {
+            color: #22c55e;
+        }
+
+        .trend-negative {
+            color: #fca5a5;
+        }
+
+        .trend-neutral {
+            color: #fbbf24;
+        }
+
+        /* Large stats card for key metrics */
+        .stat-card.highlight {
+            background: linear-gradient(135deg, rgba(126, 34, 206, 0.3) 0%, rgba(30, 60, 114, 0.3) 100%);
+            border: 2px solid rgba(251, 191, 36, 0.5);
+        }
+
+        .big-stat {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #fbbf24;
+            text-align: center;
+            margin: 15px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stat-sublabel {
+            text-align: center;
+            font-size: 1.05rem;
+            opacity: 0.9;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        /* Card Collection Section */
+        .cards-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 22px;
+            margin-bottom: 25px;
+        }
+
+        .cards-section h3 {
+            color: #fbbf24;
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .card-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-level {
+            font-weight: 800;
+            color: #fbbf24;
+            margin-top: 4px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.95);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Historical trends section */
+        .historical-trends {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .historical-trends h3 {
+            color: #fbbf24;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .trend-chart {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .trend-stat {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #fbbf24;
+        }
+
+        .trend-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .trend-stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fbbf24;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRoast {
+            from {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fall {
+            0% {
+                top: -10%;
+                opacity: 0.9;
+            }
+            100% {
+                top: 110%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(251, 191, 36, 0.5);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(251, 191, 36, 0.7);
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            bottom: -2px;
+        }
+
+        .tab-btn:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .tab-btn.active {
+            color: #fbbf24;
+            border-bottom-color: #fbbf24;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/cards" class="nav-link">Cards Gallery →</a>
+            <h1>⚔️ Clash Royale Stats</h1>
+            <p>Real-time player statistics and performance tracking</p>
+        </div>
+
+        <div class="search-box">
+            <h2>Enter Player Tag</h2>
+            <form class="search-form" id="searchForm">
+                <input type="text" id="playerTag" class="awesomplete" placeholder="e.g., #2PP or 2PP or search by name..." autocomplete="off" required>
+                <button type="submit" class="btn">Track Player</button>
+            </form>
+        </div>
+
+        <div id="content"></div>
+    </div>
+
+    <button class="view-analysis-btn" id="viewAnalysisBtn" style="display: none;">
+        View Performance Analysis 🔥
+    </button>
+
+    <!-- Performance Analysis Popup -->
+    <div class="performance-overlay" id="performanceOverlay">
+        <div class="performance-popup">
+            <button class="close-popup" id="closePopup">×</button>
+            <div id="performanceContent"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/awesomplete@1.1.7/awesomplete.min.js"></script>
+    <script>
+        const form = document.getElementById('searchForm');
+        const content = document.getElementById('content');
+        const performanceOverlay = document.getElementById('performanceOverlay');
+        const performanceContent = document.getElementById('performanceContent');
+        const viewAnalysisBtn = document.getElementById('viewAnalysisBtn');
+        const closePopupBtn = document.getElementById('closePopup');
+        const playerTagInput = document.getElementById('playerTag');
+
+        let currentPlayerTag = '';
+        let refreshInterval = null;
+        let currentPerformanceData = null;
+        let trackedPlayers = JSON.parse(localStorage.getItem('trackedPlayers') || '{}');
+        let currentHistoryData = null;
+        let awesomplete = null;
+
+        // Initialize Awesomplete with tracked players
+        function initAwesomplete() {
+            const list = Object.entries(trackedPlayers).map(([tag, name]) => ({
+                label: `${name} - ${tag}`,
+                value: tag
+            }));
+
+            awesomplete = new Awesomplete(playerTagInput, {
+                list: list,
+                minChars: 0,
+                maxItems: 10,
+                autoFirst: true
+            });
+
+            // Show suggestions on focus - always get fresh list
+            playerTagInput.addEventListener('focus', () => {
+                if (playerTagInput.value === '') {
+                    awesomplete.evaluate();
+                }
+            });
+
+            // Handle selection
+            playerTagInput.addEventListener('awesomplete-selectcomplete', (e) => {
+                form.dispatchEvent(new Event('submit'));
+            });
+        }
+
+        // Update awesomplete list when tracked players change
+        function updateAwesomplete() {
+            const list = Object.entries(trackedPlayers).map(([tag, name]) => ({
+                label: `${name} - ${tag}`,
+                value: tag
+            }));
+
+            if (awesomplete) {
+                awesomplete.list = list;
+            } else {
+                initAwesomplete();
+            }
+        }
+
+        // Initialize on page load
+        initAwesomplete();
+
+        // Auto-refresh functionality (silent, no indicator)
+        function startRefreshTimer() {
+            clearInterval(refreshInterval);
+            // Refresh every 5 minutes silently
+            refreshInterval = setInterval(() => {
+                if (currentPlayerTag) {
+                    loadPlayerStats(currentPlayerTag);
+                }
+            }, 300000);
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            let playerTag = document.getElementById('playerTag').value.trim();
+            if (!playerTag.startsWith('#')) {
+                playerTag = '#' + playerTag;
+            }
+            currentPlayerTag = playerTag;
+            loadPlayerStats(playerTag);
+        });
+
+        async function loadPlayerStats(playerTag) {
+            content.innerHTML = '<div class="loading">Loading stats...</div>';
+
+            try {
+                const response = await fetch(`/api/player/${encodeURIComponent(playerTag)}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    // Save player to history
+                    trackedPlayers[playerTag] = data.player.name;
+                    localStorage.setItem('trackedPlayers', JSON.stringify(trackedPlayers));
+                    updateAwesomplete();
+
+                    displayStats(data);
+                    startRefreshTimer();
+                } else {
+                    content.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                content.innerHTML = `<div class="error">Failed to fetch data: ${error.message}</div>`;
+            }
+        }
+
+        // Popup handlers
+        viewAnalysisBtn.addEventListener('click', () => {
+            showPerformancePopup();
+        });
+
+        closePopupBtn.addEventListener('click', () => {
+            performanceOverlay.classList.remove('show');
+        });
+
+        performanceOverlay.addEventListener('click', (e) => {
+            if (e.target === performanceOverlay) {
+                performanceOverlay.classList.remove('show');
+            }
+        });
+
+        function showPerformancePopup() {
+            if (!currentPerformanceData) return;
+
+            const { roasts, skill_rating, performance_emoji } = currentPerformanceData;
+
+            performanceContent.innerHTML = `
+                <h2>${performance_emoji} Performance Analysis</h2>
+                <div class="skill-badge">${skill_rating}</div>
+                ${roasts.map((roast, index) => `<div class="roast-item">${roast}</div>`).join('')}
+            `;
+
+            performanceOverlay.classList.add('show');
+
+            // Rain effects based on performance
+            if (skill_rating.includes('PHENOMENAL') || skill_rating.includes('GOAT')) {
+                // Rain trophies and crowns for phenomenal players!
+                rainGlory();
+            } else if (skill_rating.includes('Garbage') || skill_rating.includes('Bot') ||
+                skill_rating.includes('Help') || skill_rating.includes('trash')) {
+                // Rain thumbs down for trash players
+                rainThumbsDown();
+            }
+        }
+
+        function rainGlory() {
+            const duration = 5000; // 5 seconds of glory
+            const interval = 100; // New item every 100ms
+            const startTime = Date.now();
+            const emojis = ['🏆', '👑', '⭐', '🔥', '💎'];
+
+            const rainInterval = setInterval(() => {
+                if (Date.now() - startTime > duration) {
+                    clearInterval(rainInterval);
+                    return;
+                }
+
+                const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                const item = document.createElement('div');
+                item.className = 'thumbs-down'; // Reuse same animation
+                item.textContent = emoji;
+                item.style.left = Math.random() * 100 + '%';
+                item.style.animationDuration = (2 + Math.random() * 2) + 's';
+
+                document.body.appendChild(item);
+
+                setTimeout(() => {
+                    item.remove();
+                }, 4000);
+            }, interval);
+        }
+
+        function rainThumbsDown() {
+            const duration = 5000; // 5 seconds of raining
+            const interval = 150; // New thumb every 150ms
+            const startTime = Date.now();
+
+            const rainInterval = setInterval(() => {
+                if (Date.now() - startTime > duration) {
+                    clearInterval(rainInterval);
+                    return;
+                }
+
+                const thumb = document.createElement('div');
+                thumb.className = 'thumbs-down';
+                thumb.textContent = '👎';
+                thumb.style.left = Math.random() * 100 + '%';
+                thumb.style.animationDuration = (2 + Math.random() * 2) + 's';
+
+                document.body.appendChild(thumb);
+
+                setTimeout(() => {
+                    thumb.remove();
+                }, 4000);
+            }, interval);
+        }
+
+        async function fetchHistoricalData(playerTag) {
+            try {
+                console.log('=== FETCHING HISTORICAL DATA FOR:', playerTag);
+                const response = await fetch(`/api/player/${encodeURIComponent(playerTag)}/history?limit=30`);
+                console.log('Response status:', response.status);
+                const data = await response.json();
+
+                console.log('=== RESPONSE DATA:', {
+                    success: data.success,
+                    historyLength: data.history?.length,
+                    hasHistory: !!data.history,
+                    condition: data.success && data.history && data.history.length > 1
+                });
+
+                if (data.success && data.history && data.history.length > 1) {
+                    console.log('✅ SHOWING HISTORY TAB - conditions met');
+                    currentHistoryData = data.history;
+                    updateHistoricalTab();
+                    showHistoryTab();
+                } else {
+                    console.log('❌ NOT showing history tab:', {
+                        success: data.success,
+                        hasHistory: !!data.history,
+                        length: data.history?.length,
+                        reason: !data.success ? 'no success' : !data.history ? 'no history array' : 'not enough records'
+                    });
+                }
+            } catch (error) {
+                console.error('❌ FAILED to fetch historical data:', error);
+            }
+        }
+
+        function showHistoryTab() {
+            const historyTab = document.getElementById('historyTab');
+            console.log('showHistoryTab called:', {
+                historyTabExists: !!historyTab,
+                currentHistoryDataLength: currentHistoryData?.length
+            });
+            if (historyTab && currentHistoryData && currentHistoryData.length > 1) {
+                console.log('Showing history tab!');
+                historyTab.style.display = 'block';
+            }
+        }
+
+        function switchTab(tabName) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-content`).classList.add('active');
+        }
+
+        function updateHistoricalTab() {
+            const historyContent = document.getElementById('history-content');
+            if (!historyContent || !currentHistoryData || currentHistoryData.length < 2) return;
+
+            const history = currentHistoryData;
+            const latest = history[0];
+            const oldest = history[history.length - 1];
+
+            const trophyChange = latest.trophies - oldest.trophies;
+            const winChange = latest.wins - oldest.wins;
+            const lossChange = latest.losses - oldest.losses;
+            const totalGames = winChange + lossChange;
+            const winRate = totalGames > 0 ? ((winChange / totalGames) * 100).toFixed(1) : 0;
+
+            const trophyClass = trophyChange >= 0 ? 'trend-positive' : 'trend-negative';
+            const winRateClass = winRate >= 50 ? 'trend-positive' : 'trend-negative';
+
+            historyContent.innerHTML = `
+                <div class="historical-trends">
+                    <h3>📊 Historical Performance Overview</h3>
+                    <p style="opacity: 0.8; margin-bottom: 20px;">Based on ${history.length} data points collected over time</p>
+
+                    <div class="trend-chart">
+                        <div class="trend-stat">
+                            <div class="trend-stat-label">Trophy Change</div>
+                            <div class="trend-stat-value ${trophyClass}">${trophyChange >= 0 ? '+' : ''}${trophyChange}</div>
+                        </div>
+                        <div class="trend-stat">
+                            <div class="trend-stat-label">Games Played</div>
+                            <div class="trend-stat-value">${totalGames}</div>
+                        </div>
+                        <div class="trend-stat">
+                            <div class="trend-stat-label">Wins</div>
+                            <div class="trend-stat-value trend-positive">+${winChange}</div>
+                        </div>
+                        <div class="trend-stat">
+                            <div class="trend-stat-label">Losses</div>
+                            <div class="trend-stat-value trend-negative">+${lossChange}</div>
+                        </div>
+                        <div class="trend-stat">
+                            <div class="trend-stat-label">Win Rate</div>
+                            <div class="trend-stat-value ${winRateClass}">${winRate}%</div>
+                        </div>
+                        <div class="trend-stat">
+                            <div class="trend-stat-label">Three Crowns</div>
+                            <div class="trend-stat-value">${latest.three_crown_wins - oldest.three_crown_wins}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="historical-trends" style="margin-top: 20px;">
+                    <h3>📈 Detailed Timeline</h3>
+                    <div style="max-height: 600px; overflow-y: auto;">
+                        ${history.map((entry, index) => {
+                            const date = new Date(entry.timestamp);
+                            const prevEntry = history[index + 1];
+                            let deltaHTML = '';
+
+                            if (prevEntry) {
+                                const trophyDelta = entry.trophies - prevEntry.trophies;
+                                const winDelta = entry.wins - prevEntry.wins;
+                                const lossDelta = entry.losses - prevEntry.losses;
+                                deltaHTML = `
+                                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+                                        <span style="color: ${trophyDelta >= 0 ? '#22c55e' : '#fca5a5'};">
+                                            ${trophyDelta >= 0 ? '+' : ''}${trophyDelta} 🏆
+                                        </span>
+                                        <span style="margin-left: 15px;">+${winDelta} W</span>
+                                        <span style="margin-left: 15px;">+${lossDelta} L</span>
+                                    </div>
+                                `;
+                            }
+
+                            return `
+                                <div style="background: rgba(0,0,0,0.2); padding: 15px; margin-bottom: 10px; border-radius: 10px; border-left: 4px solid #fbbf24;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</strong>
+                                        </div>
+                                        <div style="font-size: 1.2rem; font-weight: 800; color: #fbbf24;">
+                                            ${entry.trophies.toLocaleString()} 🏆
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 8px; opacity: 0.8;">
+                                        ${entry.wins.toLocaleString()}W / ${entry.losses.toLocaleString()}L
+                                        <span style="margin-left: 15px;">Level ${entry.exp_level}</span>
+                                    </div>
+                                    ${deltaHTML}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayStats(data) {
+            const player = data.player;
+            const trends = data.trends;
+            const roasts = data.roasts || [];
+
+            // Store performance data for popup
+            currentPerformanceData = {
+                roasts,
+                skill_rating: data.skill_rating,
+                performance_emoji: data.performance_emoji
+            };
+
+            // Show the button
+            viewAnalysisBtn.style.display = 'block';
+
+            // Calculate lifetime win rate
+            const totalGames = player.wins + player.losses;
+            const winRate = totalGames > 0 ? ((player.wins / totalGames) * 100).toFixed(1) : 0;
+
+            // Trend indicators
+            let trendHTML = '';
+            if (trends) {
+                const trophyClass = trends.trophy_change >= 0 ? 'trend-positive' : 'trend-negative';
+                const trophySymbol = trends.trophy_change >= 0 ? '+' : '';
+
+                trendHTML = `
+                    <div class="stat-card">
+                        <h3>📈 7-Day Trends</h3>
+                        <div class="stat-row">
+                            <span class="stat-label">Trophy Change</span>
+                            <span class="stat-value ${trophyClass}">${trophySymbol}${trends.trophy_change}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Wins</span>
+                            <span class="stat-value trend-positive">+${trends.win_change}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Losses</span>
+                            <span class="stat-value trend-negative">+${trends.loss_change}</span>
+                        </div>
+                        ${trends.win_rate !== null ? `
+                        <div class="stat-row">
+                            <span class="stat-label">Recent Win Rate</span>
+                            <span class="stat-value trend-neutral">${trends.win_rate}%</span>
+                        </div>
+                        ` : ''}
+                        <div class="stat-row">
+                            <span class="stat-label">Data Points</span>
+                            <span class="stat-value">${trends.data_points}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Trophy gap
+            const trophyGap = player.bestTrophies - player.trophies;
+            const trophyGapClass = trophyGap === 0 ? 'trend-positive' : 'trend-negative';
+
+            // Fetch historical data
+            fetchHistoricalData(player.tag);
+
+            content.innerHTML = `
+                <!-- Tab Navigation -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="stats" onclick="switchTab('stats')">📊 Stats</button>
+                    <button class="tab-btn" data-tab="history" id="historyTab" style="display: none;" onclick="switchTab('history')">📈 Historical</button>
+                </div>
+
+                <!-- Stats Tab Content -->
+                <div class="tab-content active" id="stats-content">
+
+                <!-- Key Stats Highlights -->
+                <div class="stats-grid">
+                    <div class="stat-card highlight">
+                        <h3>
+                            ${player.arena?.iconUrls?.small ? `<img src="${player.arena.iconUrls.small}" alt="Arena" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">` : '🏆'}
+                            Current Trophies
+                        </h3>
+                        <div class="big-stat">${player.trophies.toLocaleString()}</div>
+                        <div class="stat-sublabel">Peak: ${player.bestTrophies.toLocaleString()}</div>
+                        ${trophyGap > 0 ? `<div class="stat-sublabel trend-negative">-${trophyGap} from best</div>` : ''}
+                    </div>
+
+                    <div class="stat-card highlight">
+                        <h3>📊 Lifetime Win Rate</h3>
+                        <div class="big-stat">${winRate}%</div>
+                        <div class="stat-sublabel">${player.wins.toLocaleString()}W / ${player.losses.toLocaleString()}L</div>
+                        <div class="stat-sublabel">${totalGames.toLocaleString()} total games</div>
+                    </div>
+
+                    <div class="stat-card highlight">
+                        <h3>⚡ Player Level</h3>
+                        <div class="big-stat">${player.expLevel}</div>
+                        <div class="stat-sublabel">${player.threeCrownWins.toLocaleString()} three crowns</div>
+                    </div>
+
+                    ${player.currentFavouriteCard ? `
+                    <div class="stat-card highlight">
+                        <h3>⭐ Favourite Card</h3>
+                        ${player.currentFavouriteCard.iconUrls?.medium ? `<img src="${player.currentFavouriteCard.iconUrls.medium}" alt="${player.currentFavouriteCard.name}" style="width: 100px; height: 100px; margin: 10px auto; display: block;">` : ''}
+                        <div style="text-align: center; font-size: 1.2rem; font-weight: 800;">${player.currentFavouriteCard.name}</div>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <!-- Detailed Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>👤 Player Info</h3>
+                        <div class="stat-row">
+                            <span class="stat-label">Name</span>
+                            <span class="stat-value">${player.name}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Tag</span>
+                            <span class="stat-value">${player.tag}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Arena</span>
+                            <span class="stat-value">${player.arena?.name || 'Unknown'}</span>
+                        </div>
+                        ${player.starPoints ? `
+                        <div class="stat-row">
+                            <span class="stat-label">Star Points</span>
+                            <span class="stat-value">${player.starPoints.toLocaleString()}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    ${player.clan ? `
+                    <div class="stat-card">
+                        <h3>
+                            ${player.clan.badgeUrls?.small ? `<img src="${player.clan.badgeUrls.small}" alt="Clan Badge" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">` : '🛡️'}
+                            Clan Info
+                        </h3>
+                        <div class="stat-row">
+                            <span class="stat-label">Clan</span>
+                            <span class="stat-value">${player.clan.name}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Role</span>
+                            <span class="stat-value">${player.role || 'member'}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Donations</span>
+                            <span class="stat-value">${player.donations || 0}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Received</span>
+                            <span class="stat-value">${player.donationsReceived || 0}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Total Donated</span>
+                            <span class="stat-value">${(player.totalDonations || 0).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    ` : '<div class="stat-card"><h3>🛡️ Clan Info</h3><p>Not in a clan</p></div>'}
+
+                    <div class="stat-card">
+                        <h3>⚔️ Battle Stats</h3>
+                        <div class="stat-row">
+                            <span class="stat-label">Total Battles</span>
+                            <span class="stat-value">${(player.battleCount || 0).toLocaleString()}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Wins</span>
+                            <span class="stat-value trend-positive">${player.wins.toLocaleString()}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Losses</span>
+                            <span class="stat-value trend-negative">${player.losses.toLocaleString()}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Three Crowns</span>
+                            <span class="stat-value">${player.threeCrownWins.toLocaleString()}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">3-Crown Rate</span>
+                            <span class="stat-value">${((player.threeCrownWins / totalGames) * 100).toFixed(1)}%</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>🏆 Challenge Stats</h3>
+                        <div class="stat-row">
+                            <span class="stat-label">Max Challenge Wins</span>
+                            <span class="stat-value">${player.challengeMaxWins || 0}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Challenge Cards Won</span>
+                            <span class="stat-value">${(player.challengeCardsWon || 0).toLocaleString()}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Tournament Battles</span>
+                            <span class="stat-value">${(player.tournamentBattleCount || 0).toLocaleString()}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Tournament Cards</span>
+                            <span class="stat-value">${(player.tournamentCardsWon || 0).toLocaleString()}</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>⚔️ War Stats</h3>
+                        <div class="stat-row">
+                            <span class="stat-label">War Day Wins</span>
+                            <span class="stat-value">${(player.warDayWins || 0).toLocaleString()}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Clan Cards Collected</span>
+                            <span class="stat-value">${(player.clanCardsCollected || 0).toLocaleString()}</span>
+                        </div>
+                    </div>
+
+                    ${player.leagueStatistics ? `
+                    <div class="stat-card">
+                        <h3>🏅 League Statistics</h3>
+                        ${player.leagueStatistics.currentSeason ? `
+                        <div class="stat-row">
+                            <span class="stat-label">Current Season</span>
+                            <span class="stat-value">${player.leagueStatistics.currentSeason.trophies?.toLocaleString() || 0} 🏆</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Season Best</span>
+                            <span class="stat-value">${player.leagueStatistics.currentSeason.bestTrophies?.toLocaleString() || 0}</span>
+                        </div>
+                        ` : ''}
+                        ${player.leagueStatistics.previousSeason ? `
+                        <div class="stat-row">
+                            <span class="stat-label">Previous Season</span>
+                            <span class="stat-value">${player.leagueStatistics.previousSeason.trophies?.toLocaleString() || 0}</span>
+                        </div>
+                        ` : ''}
+                        ${player.leagueStatistics.bestSeason ? `
+                        <div class="stat-row">
+                            <span class="stat-label">Best Season Ever</span>
+                            <span class="stat-value trend-positive">${player.leagueStatistics.bestSeason.trophies?.toLocaleString() || 0} 🏆</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    ` : ''}
+
+                    ${player.currentPathOfLegendSeasonResult || player.lastPathOfLegendSeasonResult || player.bestPathOfLegendSeasonResult ? `
+                    <div class="stat-card">
+                        <h3>🎖️ Path of Legend</h3>
+                        ${player.currentPathOfLegendSeasonResult ? `
+                        <div class="stat-row">
+                            <span class="stat-label">Current League</span>
+                            <span class="stat-value">League ${player.currentPathOfLegendSeasonResult.leagueNumber}</span>
+                        </div>
+                        ` : ''}
+                        ${player.lastPathOfLegendSeasonResult ? `
+                        <div class="stat-row">
+                            <span class="stat-label">Last Season</span>
+                            <span class="stat-value">League ${player.lastPathOfLegendSeasonResult.leagueNumber} (${player.lastPathOfLegendSeasonResult.trophies} 🏆)</span>
+                        </div>
+                        ` : ''}
+                        ${player.bestPathOfLegendSeasonResult ? `
+                        <div class="stat-row">
+                            <span class="stat-label">Best Ever</span>
+                            <span class="stat-value trend-positive">League ${player.bestPathOfLegendSeasonResult.leagueNumber} (${player.bestPathOfLegendSeasonResult.trophies} 🏆)</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    ` : ''}
+
+                    ${trendHTML}
+                </div>
+
+                <!-- Current Deck -->
+                ${player.currentDeck && player.currentDeck.length > 0 ? `
+                <div class="cards-section" style="margin-bottom: 25px;">
+                    <h3>⚔️ Current Deck</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; padding: 10px;">
+                        ${player.currentDeck.map(card => `
+                            <div class="card-item" style="text-align: center;">
+                                ${card.iconUrls?.medium ? `<img src="${card.iconUrls.medium}" alt="${card.name}" style="width: 80px; height: 80px; margin-bottom: 8px;">` : ''}
+                                <div style="font-weight: 700;">${card.name}</div>
+                                <div class="card-level">Lv ${card.level}${card.starLevel > 0 ? ' ⭐'.repeat(card.starLevel) : ''}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${player.currentDeckSupportCards && player.currentDeckSupportCards.length > 0 ? `
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
+                        <h4 style="color: #fbbf24; margin-bottom: 10px;">Support Cards</h4>
+                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                            ${player.currentDeckSupportCards.map(card => `
+                                <div class="card-item" style="text-align: center;">
+                                    ${card.iconUrls?.medium ? `<img src="${card.iconUrls.medium}" alt="${card.name}" style="width: 60px; height: 60px; margin-bottom: 5px;">` : ''}
+                                    <div style="font-weight: 700; font-size: 0.9rem;">${card.name}</div>
+                                    <div class="card-level">Lv ${card.level}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                ` : ''}
+
+                <!-- Achievements -->
+                ${player.achievements && player.achievements.length > 0 ? `
+                <div class="cards-section" style="margin-bottom: 25px;">
+                    <h3>🏆 Achievements (${player.achievements.filter(a => a.stars === 3).length}/${player.achievements.length} completed)</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; padding: 10px;">
+                        ${player.achievements.map(ach => {
+                            const isComplete = ach.stars === 3;
+                            const progress = Math.min((ach.value / ach.target) * 100, 100);
+                            return `
+                                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border-left: 4px solid ${isComplete ? '#22c55e' : '#fbbf24'};">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                        <strong style="font-size: 0.95rem;">${ach.name}</strong>
+                                        <span style="color: #fbbf24;">${'⭐'.repeat(ach.stars)}${'☆'.repeat(3 - ach.stars)}</span>
+                                    </div>
+                                    <div style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 8px;">${ach.info || ''}</div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                                        <span>${ach.value.toLocaleString()}/${ach.target.toLocaleString()}</span>
+                                        <span style="color: ${isComplete ? '#22c55e' : '#fbbf24'};">${progress.toFixed(0)}%</span>
+                                    </div>
+                                    <div style="background: rgba(0,0,0,0.3); height: 6px; border-radius: 3px; margin-top: 6px; overflow: hidden;">
+                                        <div style="background: ${isComplete ? '#22c55e' : '#fbbf24'}; height: 100%; width: ${progress}%; transition: width 0.3s ease;"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Badges (Top 20) -->
+                ${player.badges && player.badges.length > 0 ? `
+                <div class="cards-section" style="margin-bottom: 25px;">
+                    <h3>🎖️ Badges (Showing top 20 of ${player.badges.length})</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; padding: 10px;">
+                        ${player.badges.slice(0, 20).map(badge => {
+                            const hasProgress = badge.progress !== undefined && badge.target !== undefined;
+                            const progress = hasProgress ? Math.min((badge.progress / badge.target) * 100, 100) : 100;
+                            return `
+                                <div style="background: rgba(0,0,0,0.25); padding: 10px; border-radius: 8px; text-align: center;">
+                                    ${badge.iconUrls?.large ? `<img src="${badge.iconUrls.large}" alt="${badge.name}" style="width: 50px; height: 50px; margin-bottom: 5px;">` : ''}
+                                    <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 3px;">${badge.name}</div>
+                                    ${badge.level ? `<div style="color: #fbbf24; font-size: 0.85rem;">Level ${badge.level}</div>` : ''}
+                                    ${hasProgress ? `<div style="font-size: 0.8rem; opacity: 0.8; margin-top: 3px;">${badge.progress}/${badge.target}</div>` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Card Collection -->
+                ${player.cards && player.cards.length > 0 ? `
+                <div class="cards-section">
+                    <h3>🃏 Card Collection (${player.cards.length} cards)</h3>
+                    <div class="cards-grid">
+                        ${player.cards.map(card => `
+                            <div class="card-item">
+                                ${card.iconUrls?.medium ? `<img src="${card.iconUrls.medium}" alt="${card.name}" style="width: 60px; height: 60px; margin-bottom: 5px;">` : ''}
+                                <div>${card.name}</div>
+                                <div class="card-level">Lv ${card.level}${card.starLevel > 0 ? ' ⭐'.repeat(card.starLevel) : ''}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+
+                </div>
+                <!-- End Stats Tab Content -->
+
+                <!-- History Tab Content -->
+                <div class="tab-content" id="history-content">
+                    <!-- Historical data will be loaded here -->
+                </div>
+                <!-- End History Tab Content -->
+            `;
+        }
+
+    </script>
+</body>
+</html>
