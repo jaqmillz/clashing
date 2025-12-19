@@ -1,0 +1,7 @@
+# Cloud Functions dependencies
+firebase-functions>=0.4.0
+firebase-admin>=6.0.0
+google-cloud-firestore>=2.11.0
+requests>=2.32.0
+python-dotenv>=1.0.0
+python-dateutil>=2.8.0

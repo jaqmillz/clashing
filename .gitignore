@@ -25,3 +25,10 @@ data/*.csv
 
 # OS
 .DS_Store
+
+# Firebase
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+*.cache
+functions/.env.yaml

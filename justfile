@@ -25,3 +25,19 @@ clean-data:
 clean:
     find . -type d -name "__pycache__" -exec rm -rf {} +
     find . -type f -name "*.pyc" -delete
+
+# Firebase deployment commands
+firebase-deploy:
+    firebase deploy
+
+firebase-deploy-hosting:
+    firebase deploy --only hosting
+
+firebase-deploy-functions:
+    firebase deploy --only functions
+
+firebase-deploy-firestore:
+    firebase deploy --only firestore
+
+firebase-serve:
+    firebase serve
