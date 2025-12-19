@@ -129,11 +129,8 @@ def get_all_cards(req: https_fn.Request) -> https_fn.Response:
     Route: /api/cards
     Method: GET
     """
-    cards = get_all_unique_cards()
-
-    # Add kiss counts to each card
-    for card in cards:
-        card['kisses'] = kiss_tracker.get_card_kisses(card['name'])
+    # Get all cards directly from Firestore
+    cards = kiss_tracker.get_all_cards()
 
     return https_fn.Response(
         json.dumps({'success': True, 'cards': cards}),

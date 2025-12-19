@@ -28,6 +28,10 @@
     ],
     "rewrites": [
       {
+        "source": "/cards",
+        "destination": "/cards.html"
+      },
+      {
         "source": "/api/player/**",
         "function": "get_player_stats"
       },

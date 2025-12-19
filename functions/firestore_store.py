@@ -208,6 +208,27 @@ class FirestoreCardKissTracker:
             return card_doc.to_dict().get('kisses', 0)
         return 0
 
+    def get_all_cards(self) -> List[dict]:
+        """Get all cards from Firestore"""
+        docs = self.cards_collection.stream()
+
+        cards = []
+        for doc in docs:
+            data = doc.to_dict()
+            cards.append({
+                'id': data.get('id'),
+                'name': data.get('name'),
+                'icon_url': data.get('icon_url'),
+                'max_level': data.get('max_level'),
+                'rarity': data.get('rarity'),
+                'elixir_cost': data.get('elixir_cost'),
+                'kiss_count': data.get('kiss_count', 0)
+            })
+
+        # Sort by elixir cost, then name
+        cards.sort(key=lambda x: (x.get('elixir_cost', 0), x.get('name', '')))
+        return cards
+
     def get_leaderboard(self, limit: int = 50) -> List[tuple]:
         """Get top kissed cards"""
         query = (self.cards_collection
