@@ -11,7 +11,9 @@ load_dotenv()
 class ClashRoyaleAPI:
     """Client for Clash Royale API"""
 
-    BASE_URL = "https://api.clashroyale.com/v1"
+    # Use proxy VM with static IP instead of direct API calls
+    # This allows us to whitelist a single static IP in the Clash Royale API
+    BASE_URL = "http://34.123.171.42:8080/v1"
 
     def __init__(self, api_key=None):
         self.api_key = api_key or os.getenv('CLASH_ROYALE_API_KEY')
